@@ -8,16 +8,30 @@ import ar.edu.utn.dds.k3003.facades.dtos.PdIDTO;
 import ar.edu.utn.dds.k3003.model.Coleccion;
 import ar.edu.utn.dds.k3003.repository.ColeccionRepository;
 import ar.edu.utn.dds.k3003.repository.InMemoryColeccionRepo;
+
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import lombok.val;
 
+@Service
 public class Fachada implements FachadaFuente {
 
   private ColeccionRepository coleccionRepository;
 
-  public Fachada() {
+  /**
+   * Constructor por defecto para testing
+   */
+  protected Fachada() {
     this.coleccionRepository = new InMemoryColeccionRepo();
+  }
+
+  @Autowired
+  public Fachada(ColeccionRepository coleccionRepository) {
+    this.coleccionRepository = coleccionRepository;
   }
 
   @Override
@@ -63,5 +77,12 @@ public class Fachada implements FachadaFuente {
   @Override
   public PdIDTO agregar(PdIDTO pdIDTO) throws IllegalStateException {
     return null;
+  }
+
+  @Override
+  public List<ColeccionDTO> colecciones() {
+    return this.coleccionRepository.findAll().stream()
+        .map(coleccion -> new ColeccionDTO(coleccion.getNombre(), coleccion.getDescripcion()))
+        .toList();
   }
 }
